@@ -231,7 +231,7 @@ def canonicalize_smiles_from_file(fname):
         print("{} SMILES retrieved".format(len(smiles_list)))
         return smiles_list
 
-def filter_mol(mol, max_heavy_atoms=50, min_heavy_atoms=10, element_list=[6,7,8,9,16,17,35]):
+def filter_mol(mol, max_heavy_atoms=10, min_heavy_atoms=0, element_list=[6,7,8,9,16,17,35]):
     """Filters molecules on number of heavy atoms and atom types"""
     if mol is not None:
         num_heavy = min_heavy_atoms<mol.GetNumHeavyAtoms()<max_heavy_atoms
@@ -312,7 +312,7 @@ def construct_vocabulary(smiles_list):
 if __name__ == "__main__":
     smiles_file = sys.argv[1]
     print("Reading smiles...")
-    smiles_list = canonicalize_smiles_from_file(smiles_file)
+    smiles_list = canonicalize_smiles_from_file(smiles_file) # getting stuck here
     print("Constructing vocabulary...")
     voc_chars = construct_vocabulary(smiles_list)
     write_smiles_to_file(smiles_list, "data/mols_filtered.smi")

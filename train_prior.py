@@ -19,6 +19,7 @@ def pretrain(restore_from=None):
     voc = Vocabulary(init_from_file="data/Voc")
 
     # Create a Dataset from a SMILES file
+    print('Loading data...')
     moldata = MolData("data/mols_filtered.smi", voc)
     data = DataLoader(moldata, batch_size=128, shuffle=True, drop_last=True,
                       collate_fn=MolData.collate_fn)
@@ -30,7 +31,12 @@ def pretrain(restore_from=None):
         Prior.rnn.load_state_dict(torch.load(restore_from))
 
     optimizer = torch.optim.Adam(Prior.rnn.parameters(), lr = 0.001)
+    all_losses = []
+    all_validity = []
     for epoch in range(1, 6):
+        validity = []
+        losses = []
+        print('Epoch ' + str(epoch))
         # When training on a few million compounds, this model converges
         # in a few of epochs or even faster. If model sized is increased
         # its probably a good idea to check loss against an external set of
@@ -43,11 +49,21 @@ def pretrain(restore_from=None):
             # Calculate loss
             log_p, _ = Prior.likelihood(seqs)
             loss = - log_p.mean()
+            losses.append(loss)
 
             # Calculate gradients and take a step
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+
+            # Look at validities
+            seqs, likelihood, _ = Prior.sample(128)
+            valid = 0
+            for i, seq in enumerate(seqs.cpu().numpy()):
+                smile = voc.decode(seq)
+                if Chem.MolFromSmiles(smile):
+                    valid += 1
+            validity.append(valid/len(seqs))
 
             # Every 500 steps we decrease learning rate and print some information
             if step % 500 == 0 and step != 0:
@@ -66,8 +82,21 @@ def pretrain(restore_from=None):
                 tqdm.write("*" * 50 + "\n")
                 torch.save(Prior.rnn.state_dict(), "data/Prior.ckpt")
 
+        all_losses.append(losses)
+        all_validity.append(validity)
+
+        torch.save(all_losses, "data/Prior_losses")
+        torch.save(all_validity, "data/Prior_validities")
+
         # Save the Prior
         torch.save(Prior.rnn.state_dict(), "data/Prior.ckpt")
+    torch.save(all_losses, "data/Prior_losses")
+    torch.save(all_validity, "data/Prior_validities")
 
 if __name__ == "__main__":
     pretrain()
+
+# Things to look at
+# Way to test RNN generation 
+# Look at what figs they have for RNN validation 
+# Compare to their dataset? 

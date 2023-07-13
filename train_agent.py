@@ -10,7 +10,7 @@ from shutil import copyfile
 from model import RNN
 from data_structs import Vocabulary, Experience
 from scoring_functions import get_scoring_function
-from utils import Variable, seq_to_smiles, fraction_valid_smiles, unique
+from utils import Variable, seq_to_smiles, fraction_valid_smiles, unique, sa_score, percentage_easy_sa, percentage_unique
 from vizard_logger import VizardLog
 
 def train_agent(restore_prior_from='data/Prior.ckpt',
@@ -22,6 +22,7 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
                 num_processes=0, sigma=60,
                 experience_replay=0):
 
+    print('sigma used: ' + str(sigma))
     voc = Vocabulary(init_from_file="data/Voc")
 
     start_time = time.time()
@@ -65,6 +66,10 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
 
     # Information for the logger
     step_score = [[], []]
+    sa = []
+    novel = []
+    valid = []
+    scores = []
 
     print("Model initialized, starting training...")
 
@@ -85,7 +90,8 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         score = scoring_function(smiles)
 
         # Calculate augmented likelihood
-        augmented_likelihood = prior_likelihood + sigma * Variable(score)
+        # augmented_likelihood = prior_likelihood + sigma * Variable(score)
+        augmented_likelihood = (1 - sigma) * prior_likelihood + sigma * Variable(score)
         loss = torch.pow((augmented_likelihood - agent_likelihood), 2)
 
         # Experience Replay
@@ -93,7 +99,8 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         if experience_replay and len(experience)>4:
             exp_seqs, exp_score, exp_prior_likelihood = experience.sample(4)
             exp_agent_likelihood, exp_entropy = Agent.likelihood(exp_seqs.long())
-            exp_augmented_likelihood = exp_prior_likelihood + sigma * exp_score
+            # exp_augmented_likelihood = exp_prior_likelihood + sigma * exp_score
+            exp_augmented_likelihood = (1 - sigma) * exp_prior_likelihood + sigma * exp_score
             exp_loss = torch.pow((Variable(exp_augmented_likelihood) - exp_agent_likelihood), 2)
             loss = torch.cat((loss, exp_loss), 0)
             agent_likelihood = torch.cat((agent_likelihood, exp_agent_likelihood), 0)
@@ -135,6 +142,7 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         step_score[0].append(step + 1)
         step_score[1].append(np.mean(score))
 
+
         # Log some weights
         logger.log(Agent.rnn.gru_2.weight_ih.cpu().data.numpy()[::100], "weight_GRU_layer_2_w_ih")
         logger.log(Agent.rnn.gru_2.weight_hh.cpu().data.numpy()[::100], "weight_GRU_layer_2_w_hh")
@@ -144,6 +152,13 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         logger.log("\n".join([smiles + "\t" + str(round(score, 2)) for smiles, score in zip \
                             (smiles[:12], score[:12])]), "SMILES", dtype="text", overwrite=True)
         logger.log(np.array(step_score), "Scores")
+
+        # Log SMILES features
+        sa.append(percentage_easy_sa(smiles))
+        novel.append(percentage_unique(smiles))
+        valid.append(fraction_valid_smiles(smiles))
+        scores.append(np.mean(score))
+
 
     # If the entire training finishes, we create a new folder where we save this python file
     # as well as some sampled sequences and the contents of the experinence (which are the highest
@@ -161,6 +176,12 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
     prior_likelihood = prior_likelihood.data.cpu().numpy()
     smiles = seq_to_smiles(seqs, voc)
     score = scoring_function(smiles)
+
+    np.save(os.path.join(save_dir,'training_log_sa.npy'), np.array(sa))
+    np.save(os.path.join(save_dir,'training_log_novel.npy'), np.array(novel))
+    np.save(os.path.join(save_dir,'training_log_valid.npy'), np.array(valid))
+    np.save(os.path.join(save_dir,'training_log_scores.npy'), np.array(scores))
+
     with open(os.path.join(save_dir, "sampled"), 'w') as f:
         f.write("SMILES Score PriorLogP\n")
         for smiles, score, prior_likelihood in zip(smiles, score, prior_likelihood):

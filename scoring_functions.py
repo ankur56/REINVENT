@@ -6,8 +6,10 @@ from rdkit import rdBase
 from rdkit.Chem import AllChem
 from rdkit import DataStructs
 from sklearn import svm
+from smiles_to_bandgap import get_bandgap, get_bandgap_openbabel
 import time
 import pickle
+from scipy.stats import norm
 import re
 import threading
 import pexpect
@@ -40,6 +42,39 @@ class no_sulphur():
         if mol:
             has_sulphur = any(atom.GetAtomicNum() == 16 for atom in mol.GetAtoms())
             return float(not has_sulphur)
+        return 0.0
+
+# TODO: for now, explicitly enforce SMILES validity, later can relax this and see what happens 
+# weird: different scoring function from the paper, play around with this
+class bandgap_range():
+    """Scores structures based band gap values within a certain target range."""
+
+    kwargs = []
+
+    def __init__(self):
+        pass
+    def __call__(self, smile):
+        mol = Chem.MolFromSmiles(smile)
+        if mol:
+            bandgap = get_bandgap_openbabel(smile)
+            in_range=False
+            if bandgap < 4 and bandgap > 1:
+                in_range=True
+            return float(in_range)
+        return 0.0
+    
+class bandgap_range_soft():
+    """Scores structures based band gap values within a certain target range."""
+
+    kwargs = []
+
+    def __init__(self):
+        pass
+    def __call__(self, smile):
+        mol = Chem.MolFromSmiles(smile)
+        if mol:
+            bandgap = get_bandgap_openbabel(smile)
+            return float(norm.pdf(bandgap, 2, 1)/norm.pdf(2, 2, 1))
         return 0.0
 
 class tanimoto():
@@ -175,7 +210,7 @@ class Singleprocessing():
 
 def get_scoring_function(scoring_function, num_processes=None, **kwargs):
     """Function that initializes and returns a scoring function by name"""
-    scoring_function_classes = [no_sulphur, tanimoto, activity_model]
+    scoring_function_classes = [no_sulphur, tanimoto, activity_model, bandgap_range, bandgap_range_soft]
     scoring_functions = [f.__name__ for f in scoring_function_classes]
     scoring_function_class = [f for f in scoring_function_classes if f.__name__ == scoring_function][0]
 

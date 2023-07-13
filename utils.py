@@ -1,6 +1,15 @@
 import torch
 import numpy as np
 from rdkit import Chem
+from rdkit.Chem import RDConfig
+import os
+import sys
+sys.path.append(os.path.join(RDConfig.RDContribDir, 'SA_Score'))
+import sascorer
+#import pickle
+import pickle5 as pickle
+
+
 
 def Variable(tensor):
     """Wrapper for torch.autograd.Variable that also accepts
@@ -42,3 +51,51 @@ def unique(arr):
     if torch.cuda.is_available():
         return torch.LongTensor(np.sort(idxs)).cuda()
     return torch.LongTensor(np.sort(idxs))
+
+#
+# calculation of synthetic accessibility score as described in:
+#
+# Estimation of Synthetic Accessibility Score of Drug-like Molecules based on Molecular Complexity and Fragment Contributions
+# Peter Ertl and Ansgar Schuffenhauer
+# Journal of Cheminformatics 1:8 (2009)
+# http://www.jcheminf.com/content/1/1/8
+#
+
+# Score is between 1 (easy to synthesize) and 10 (difficult to synthesize) 
+# Above 6 are classified as difficult to synthesize
+def sa_score(smiles):
+    sa_scores = []
+    for smile in smiles:
+        mol = Chem.MolFromSmiles(smile)
+        if mol:
+            sa_scores.append(sascorer.calculateScore(mol))
+
+    return sa_scores
+
+def percentage_easy_sa(smiles):
+    sa_scores = sa_score(smiles)
+    return np.sum(np.array(sa_scores) < 7)/len(sa_scores)
+
+def pickle_to_data(filename):
+    with open(filename, "rb") as handle:
+        qm9_data = pickle.load(handle)
+
+    # Convert the keys and values of the dictionary into separate lists
+    smiles_list = list(qm9_data.keys())
+    property_list = list(qm9_data.values())
+
+    # Extract the bandgap as a separate list
+    bandgap = [prop[3] for prop in property_list]
+
+    return smiles_list, bandgap
+
+# Percentage of smiles in a list that are 
+def percentage_unique(smiles):
+    # import qm9 dataset
+    train_smiles_list, train_bandgap = pickle_to_data("data//qm9_key_smiles_1_full_train_data.pickle")
+    holdout_smiles_list, holdout_bandgap = pickle_to_data("data/qm9_key_smiles_1_holdout_data.pickle")
+    full_qm9_smiles_list = train_smiles_list + holdout_smiles_list
+
+    unique = [smile in full_qm9_smiles_list for smile in smiles]
+    pcnt_unique = (len(unique)-sum(unique))/len(unique)
+    return pcnt_unique
