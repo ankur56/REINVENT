@@ -24,10 +24,10 @@ parser.add_argument('--num-steps', action='store', dest='n_steps', type=int,
                     default=3000)
 parser.add_argument('--batch-size', action='store', dest='batch_size', type=int,
                     default=64)
-#parser.add_argument('--sigma', action='store', dest='sigma', type=int,
-#                    default=20)
-parser.add_argument('--sigma', action='store', dest='sigma', type=float,
-                    default=0.5)
+parser.add_argument('--sigma', action='store', dest='sigma', type=int,
+                    default=20)
+#parser.add_argument('--sigma', action='store', dest='sigma', type=float,
+#                    default=0.5)
 parser.add_argument('--experience', action='store', dest='experience_replay', type=int,
                     default=0, help='Number of experience sequences to sample each step. '\
                     '0 means no experience replay.')

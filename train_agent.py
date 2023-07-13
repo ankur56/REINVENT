@@ -90,8 +90,8 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         score = scoring_function(smiles)
 
         # Calculate augmented likelihood
-        # augmented_likelihood = prior_likelihood + sigma * Variable(score)
-        augmented_likelihood = (1 - sigma) * prior_likelihood + sigma * Variable(score)
+        augmented_likelihood = prior_likelihood + sigma * Variable(score)
+        #augmented_likelihood = (1 - sigma) * prior_likelihood + sigma * Variable(score)
         loss = torch.pow((augmented_likelihood - agent_likelihood), 2)
 
         # Experience Replay
@@ -99,8 +99,8 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         if experience_replay and len(experience)>4:
             exp_seqs, exp_score, exp_prior_likelihood = experience.sample(4)
             exp_agent_likelihood, exp_entropy = Agent.likelihood(exp_seqs.long())
-            # exp_augmented_likelihood = exp_prior_likelihood + sigma * exp_score
-            exp_augmented_likelihood = (1 - sigma) * exp_prior_likelihood + sigma * exp_score
+            exp_augmented_likelihood = exp_prior_likelihood + sigma * exp_score
+            #exp_augmented_likelihood = (1 - sigma) * exp_prior_likelihood + sigma * exp_score
             exp_loss = torch.pow((Variable(exp_augmented_likelihood) - exp_agent_likelihood), 2)
             loss = torch.cat((loss, exp_loss), 0)
             agent_likelihood = torch.cat((agent_likelihood, exp_agent_likelihood), 0)

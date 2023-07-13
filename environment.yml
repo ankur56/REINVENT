@@ -105,5 +105,4 @@ dependencies:
   - pip:
       - pickle5==0.0.12
       - pyyaml==6.0
-      - torch==0.1.12-2
 prefix: /Users/ishaniganguly/miniconda3/envs/reinvent_2
