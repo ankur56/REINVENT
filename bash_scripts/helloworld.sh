@@ -1,12 +1,9 @@
-#!/bin/sh
-#
-# Simple "Hello World" submit script for Slurm.
-#
-#SBATCH --job-name=HelloWorld 
-#SBATCH -c 1                   
-#SBATCH --time=1:00             
-#SBATCH --mem-per-cpu=1gb       
-#SBATCH --gres=gpu:gtx1080:1   
+#!/bin/bash
+#SBATCH -N 1
+#SBATCH -C cpu
+#SBATCH -q regular
+#SBATCH -J helloworld
+#SBATCH -t 00:05:00
  
 echo "Hello World"
 sleep 10
