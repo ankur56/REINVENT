@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Simple "Hello World" submit script for Slurm.
 #
