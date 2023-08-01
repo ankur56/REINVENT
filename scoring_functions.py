@@ -5,7 +5,7 @@ from rdkit import Chem
 from rdkit import rdBase
 from rdkit.Chem import AllChem
 from rdkit import DataStructs
-from sklearn import svm
+#from sklearn import svm
 from smiles_to_bandgap import get_bandgap, get_bandgap_openbabel
 import time
 import pickle
