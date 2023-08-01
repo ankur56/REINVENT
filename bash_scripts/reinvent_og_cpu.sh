@@ -5,6 +5,6 @@
 #SBATCH -J og_reinvent
 #SBATCH -t 01:00:00
  
-python ../main.py --scoring-function no_sulphur --num_steps 10
+python ../main.py --scoring-function no_sulphur --num-steps 10
  
 # End of script
