@@ -9,7 +9,7 @@ from rdkit import DataStructs
 from smiles_to_bandgap import get_bandgap, get_bandgap_openbabel
 import time
 import pickle
-from scipy.stats import norm
+#from scipy.stats import norm
 import re
 import threading
 import pexpect
