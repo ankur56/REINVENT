@@ -12,7 +12,7 @@ from data_structs import Vocabulary, Experience
 from scoring_functions import get_scoring_function
 from utils import Variable, seq_to_smiles, fraction_valid_smiles, unique, sa_score, percentage_easy_sa, percentage_unique
 from vizard_logger import VizardLog
-from scipy.stats import levy
+#from scipy.stats import levy
 
 def train_agent(restore_prior_from='data/Prior.ckpt',
                 restore_agent_from='data/Prior.ckpt',
