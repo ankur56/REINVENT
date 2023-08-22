@@ -58,5 +58,5 @@ if __name__ == "__main__":
         arg_dict['scoring_function_kwargs'] = kwarg_dict
     else:
         arg_dict['scoring_function_kwargs'] = dict()
-    print('scoring function used: ' + scoring_function)
+    print('about to train agent')
     train_agent(**arg_dict)
