@@ -71,7 +71,7 @@ class bandgap_range_soft():
     def __init__(self):
         pass
     def __call__(self, smile):
-        # mol = Chem.MolFromSmiles(smile)
+        mol = Chem.MolFromSmiles(smile)
         # if mol:
         #     bandgap = get_bandgap_openbabel(smile)
         #     return float(norm.pdf(bandgap, 2, 1)/norm.pdf(2, 2, 1))
