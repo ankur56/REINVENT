@@ -2,6 +2,7 @@
 #SBATCH -N 1
 #SBATCH -C cpu
 #SBATCH -q regular
+#SBATCH --mem=10GB
 #SBATCH -J bandgap_debug
 #SBATCH -t 01:00:00
  
