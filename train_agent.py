@@ -22,7 +22,7 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
                 batch_size=64, n_steps=3000,
                 num_processes=0, sigma=60,sigma_mode='static',
                 experience_replay=0):
-
+    print('started training')
     print('sigma used: ' + str(sigma))
     print('sigma mode: ' + sigma_mode)
     voc = Vocabulary(init_from_file="data/Voc")

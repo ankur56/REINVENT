@@ -46,7 +46,7 @@ parser.add_argument('--save-dir', action='store', dest='save_dir',
                     help='Path where results and model are saved. Default is data/results/run_<datetime>.')
 
 if __name__ == "__main__":
-
+    print('begun main sequence')
     arg_dict = vars(parser.parse_args())
 
     if arg_dict['scoring_function_kwargs']:
@@ -58,5 +58,5 @@ if __name__ == "__main__":
         arg_dict['scoring_function_kwargs'] = kwarg_dict
     else:
         arg_dict['scoring_function_kwargs'] = dict()
-
+    print('scoring function used: ' + scoring_function)
     train_agent(**arg_dict)
