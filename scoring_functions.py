@@ -6,13 +6,15 @@ from rdkit import rdBase
 from rdkit.Chem import AllChem
 from rdkit import DataStructs
 #from sklearn import svm
-from smiles_to_bandgap import get_bandgap, get_bandgap_openbabel
+from smiles_to_bandgap import get_bandgap_unique, get_bandgap_openbabel
 import time
 import pickle
 from scipy.stats import norm
 import re
 import threading
 import pexpect
+from concurrent.futures import ProcessPoolExecutor
+
 rdBase.DisableLog('rdApp.error')
 
 """Scoring function should be a class where some tasks that are shared for every call
@@ -56,7 +58,7 @@ class bandgap_range():
     def __call__(self, smile):
         mol = Chem.MolFromSmiles(smile)
         if mol:
-            bandgap = get_bandgap_openbabel(smile)
+            bandgap = get_bandgap_unique(smile)
             in_range=False
             if bandgap < 4 and bandgap > 1:
                 in_range=True
@@ -205,7 +207,9 @@ class Singleprocessing():
     def __init__(self, scoring_function=None):
         self.scoring_function = scoring_function()
     def __call__(self, smiles):
-        scores = [self.scoring_function(smile) for smile in smiles]
+        with ProcessPoolExecutor(max_workers=12) as executor:
+            scores = list(executor.map(self.scoring_function, smiles))
+        #scores = [self.scoring_function(smile) for smile in smiles]
         return np.array(scores, dtype=np.float32)
 
 def get_scoring_function(scoring_function, num_processes=None, **kwargs):

@@ -1,4 +1,4 @@
-name: reinvent_2
+name: reinvent
 channels:
   - rdkit
   - bokeh
@@ -105,4 +105,4 @@ dependencies:
   - pip:
       - pickle5==0.0.12
       - pyyaml==6.0
-prefix: /Users/ishaniganguly/miniconda3/envs/reinvent_2
+        #prefix: /Users/ishaniganguly/miniconda3/envs/reinvent_2

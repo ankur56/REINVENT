@@ -1,0 +1,878 @@
+/pscratch/sd/a/ankur/reinvent/REINVENT/scoring_functions.py:148: SyntaxWarning: "is" with a literal. Did you mean "=="?
+  if output is 0:
+/pscratch/sd/a/ankur/reinvent/REINVENT/model.py:65: UserWarning: Implicit dimension choice for log_softmax has been deprecated. Change the call to include dim=X as an argument.
+  log_prob = F.log_softmax(logits)
+/pscratch/sd/a/ankur/reinvent/REINVENT/model.py:66: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  prob = F.softmax(logits)
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 1
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in ParseSmiles
+  Failed to kekulize aromatic SMILES
+
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in ParseSmiles
+  Failed to kekulize aromatic SMILES
+
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 3 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 1 4 5
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 5
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3 1
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2 6
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 4 1
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 5
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2 6
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 4
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3 2
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 5
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 4
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 1
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 5
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 4
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 1
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 4
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 5 4
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 4
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 4
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 6
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 4
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 5
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 6 2
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 6
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 1
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3 4
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3 8
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 5
+==============================
+*** Open Babel Warning  in ParseSmiles
+  Ignoring stereochemistry. Not enough connections to this atom. 
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 6
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 4 3
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 4 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 6 4 5 3
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 4 6
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2 4
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3 4
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 3 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2 6 3
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 4
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 4
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 3 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 1 4 7
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 7 6
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2 3
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 6
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 5
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in ParseSmiles
+  Failed to kekulize aromatic SMILES
+
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 1 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 2
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+==============================
+*** Open Babel Warning  in CorrectStereoAtoms
+  Could not correct 2 stereocenter(s) in this molecule ()
+  with Atom Ids as follows: 3 6
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+slurmstepd: error: *** JOB 14808903 ON nid004584 CANCELLED AT 2023-09-02T01:22:19 ***
