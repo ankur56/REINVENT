@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #SBATCH -A m4079
-#SBATCH --qos=debug
+#SBATCH --qos=regular
 #SBATCH --job-name=reinvent
 #SBATCH -o ri_%j.eut
 #SBATCH -e ri_%j.err
@@ -11,13 +11,14 @@
 #SBATCH --nodes=1
 ##SBATCH --ntasks=31
 ##SBATCH --cpus-per-task=8
-#SBATCH --time=00:30:00
-##SBATCH --image=stephey/orca:3.0
+#SBATCH --time=06:00:00
 
-filename="${1%.*}"
+#filename="${1%.*}"
 cd $SLURM_SUBMIT_DIR
 
-python main.py --scoring-function bandgap_range --num-steps 10
+module load gcc/11.2.0
+
+python main.py --scoring-function bandgap_range --num-steps 300 --batch-size 64 --sigma_mode static --sigma 30
  
 # End of script
 #

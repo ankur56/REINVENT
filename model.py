@@ -7,6 +7,10 @@ import torch.nn.functional as F
 
 from utils import Variable
 
+#import logging
+
+#logging.basicConfig(filename='RNN_debug_log.txt', level=logging.DEBUG)
+
 class MultiGRU(nn.Module):
     """ Implements a three layer GRU cell including an embedding layer
        and an output linear layer back to the size of the vocabulary"""
@@ -37,6 +41,7 @@ class RNN():
     def __init__(self, voc):
         self.rnn = MultiGRU(voc.vocab_size)
         if torch.cuda.is_available():
+            print("CUDA available", flush=True)
             self.rnn.cuda()
         self.voc = voc
 
@@ -53,6 +58,7 @@ class RNN():
                                       currently used.
         """
         batch_size, seq_length = target.size()
+        #logging.debug(f'Target shape: {target.shape}, Type: {type(target)}')
         start_token = Variable(torch.zeros(batch_size, 1).long())
         start_token[:] = self.voc.vocab['GO']
         x = torch.cat((start_token, target[:, :-1]), 1)
@@ -62,10 +68,11 @@ class RNN():
         entropy = Variable(torch.zeros(batch_size))
         for step in range(seq_length):
             logits, h = self.rnn(x[:, step], h)
-            log_prob = F.log_softmax(logits)
-            prob = F.softmax(logits)
+            log_prob = F.log_softmax(logits, dim=1)
+            prob = F.softmax(logits, dim=1)
             log_probs += NLLLoss(log_prob, target[:, step])
             entropy += -torch.sum((log_prob * prob), 1)
+        #logging.debug(f'Final log_probs: {log_probs}, Type: {type(log_probs)}')
         return log_probs, entropy
 
     def sample(self, batch_size, max_length=140):
@@ -111,6 +118,7 @@ class RNN():
             if torch.prod(finished) == 1: break
 
         sequences = torch.cat(sequences, 1)
+        #logging.debug(f'Sampled sequences shape: {sequences.shape}, Type: {type(sequences)}')
         return sequences.data, log_probs, entropy
 
 def NLLLoss(inputs, targets):
@@ -125,7 +133,9 @@ def NLLLoss(inputs, targets):
         Outputs:
             loss : (batch_size) *Loss for each example*
     """
-
+    #logging.debug('\n----- Calculating NLLLoss -----')
+    #logging.debug(f'Inputs shape: {inputs.shape}, Type: {type(inputs)}')
+    #logging.debug(f'Targets shape: {targets.shape}, Type: {type(targets)}')
     if torch.cuda.is_available():
         target_expanded = torch.zeros(inputs.size()).cuda()
     else:
@@ -134,4 +144,5 @@ def NLLLoss(inputs, targets):
     target_expanded.scatter_(1, targets.contiguous().view(-1, 1).data, 1.0)
     loss = Variable(target_expanded) * inputs
     loss = torch.sum(loss, 1)
+    #logging.debug(f'Loss shape: {loss.shape}, Type: {type(loss)}')
     return loss

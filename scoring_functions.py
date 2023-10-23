@@ -14,7 +14,6 @@ import re
 import threading
 import pexpect
 from concurrent.futures import ProcessPoolExecutor
-
 rdBase.DisableLog('rdApp.error')
 
 """Scoring function should be a class where some tasks that are shared for every call
@@ -47,9 +46,10 @@ class no_sulphur():
         return 0.0
 
 # TODO: for now, explicitly enforce SMILES validity, later can relax this and see what happens 
-# weird: different scoring function from the paper, play around with this
 class bandgap_range():
-    """Scores structures based band gap values within a certain target range."""
+    """Scores structures based on band gap values computed using Openbabel.
+    Band gaps should within a certain target range. Score is 1 if the badgap is within 
+    the specified range, otherwise the Score is 0."""
 
     kwargs = []
 
@@ -58,12 +58,11 @@ class bandgap_range():
     def __call__(self, smile):
         mol = Chem.MolFromSmiles(smile)
         if mol:
-            bandgap = get_bandgap_unique(smile)
-            in_range=False
-            if bandgap < 4 and bandgap > 1:
-                in_range=True
+            csmile = Chem.MolToSmiles(mol)
+            bandgap = get_bandgap_unique(csmile)
+            in_range = (bandgap < 4.0 and bandgap > 2.0)
             return float(in_range)
-        return 0.0
+        return -1.0
     
 class bandgap_range_soft():
     """Scores structures based band gap values within a certain target range."""
@@ -75,8 +74,8 @@ class bandgap_range_soft():
     def __call__(self, smile):
         mol = Chem.MolFromSmiles(smile)
         if mol:
-            bandgap = get_bandgap_openbabel(smile)
-        #     return float(norm.pdf(bandgap, 2, 1)/norm.pdf(2, 2, 1))
+            bandgap = get_bandgap_unique(smile)
+            return float(norm.pdf(bandgap, 2, 1)/norm.pdf(2, 2, 1))
         return 0.0
 
 class tanimoto():
@@ -145,7 +144,8 @@ class Worker():
     def __call__(self, smile, index, result_list):
         self.proc.sendline(smile)
         output = self.proc.expect([re.escape(smile) + " 1\.0+|[0]\.[0-9]+", 'None', pexpect.TIMEOUT])
-        if output is 0:
+        #if output is 0:
+        if output == 0:
             score = float(self.proc.after.lstrip(smile + " "))
         elif output in [1, 2]:
             score = 0.0
@@ -204,15 +204,17 @@ class Multiprocessing():
 class Singleprocessing():
     """Adds an option to not spawn new processes for the scoring functions, but rather
        run them in the main process."""
-    def __init__(self, scoring_function=None):
+    def __init__(self, scoring_function=None, batch_size=16):
         self.scoring_function = scoring_function()
+        self.batch_size = batch_size
     def __call__(self, smiles):
-        with ProcessPoolExecutor(max_workers=12) as executor:
+        print("Batch Size: ", self.batch_size, flush=True)
+        with ProcessPoolExecutor(max_workers=self.batch_size) as executor:
             scores = list(executor.map(self.scoring_function, smiles))
         #scores = [self.scoring_function(smile) for smile in smiles]
         return np.array(scores, dtype=np.float32)
 
-def get_scoring_function(scoring_function, num_processes=None, **kwargs):
+def get_scoring_function(scoring_function, num_processes=None, batch_size=16, **kwargs):
     """Function that initializes and returns a scoring function by name"""
     scoring_function_classes = [no_sulphur, tanimoto, activity_model, bandgap_range, bandgap_range_soft]
     scoring_functions = [f.__name__ for f in scoring_function_classes]
@@ -226,5 +228,5 @@ def get_scoring_function(scoring_function, num_processes=None, **kwargs):
             setattr(scoring_function_class, k, v)
 
     if num_processes == 0:
-        return Singleprocessing(scoring_function=scoring_function_class)
+        return Singleprocessing(scoring_function=scoring_function_class, batch_size=batch_size)
     return Multiprocessing(scoring_function=scoring_function, num_processes=num_processes)

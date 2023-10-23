@@ -89,6 +89,49 @@ def pickle_to_data(filename):
 
     return smiles_list, bandgap
 
+def canonicalize_smiles(smiles_list):
+    canonical_smiles = []
+    for smi in smiles_list:
+        mol = Chem.MolFromSmiles(smi)
+        if mol is not None:  # Ensure the SMILES is valid
+            canonical_smiles.append(Chem.MolToSmiles(mol))
+        else:
+            print(f"Warning: Couldn't parse SMILES: {smi}", flush=True)
+            canonical_smiles.append(smi)
+    return canonical_smiles
+
+def check_and_save_smiles(smiles, smiles_set, present_filepath="present_smiles.smi", absent_filepath="absent_smiles.smi"):
+    """
+    Check the existence of SMILES strings in a dataset and save them into separate files.
+
+    Parameters:
+        smiles (list): List of SMILES strings to check.
+        smiles_set (set): Set of SMILES strings to check against.
+        present_filepath (str): Path to save SMILES that are present.
+        absent_filepath (str): Path to save SMILES that are absent.
+
+    Returns:
+        int: Number of SMILES strings not found in the set.
+    """
+    csmiles = canonicalize_smiles(smiles)
+    absent_smiles = [smi for smi in csmiles if smi not in smiles_set]
+
+    # Writing absent smiles
+    with open(absent_filepath, 'a') as f:
+        for smi in absent_smiles:
+            f.write(smi + "\n")
+
+    # If you need to write present smiles without calculating them explicitly,
+    # you might create a set of absent_smiles and subtract it from the input smiles.
+    if present_filepath:
+        present_smiles = set(csmiles) - set(absent_smiles)  # set difference gives us the present smiles.
+        with open(present_filepath, 'a') as f:
+            for smi in present_smiles:
+                f.write(smi + "\n")
+
+    # Returning the number of absent smiles.
+    return len(absent_smiles)/len(csmiles)
+
 # Percentage of smiles in a list that are 
 def percentage_unique(smiles):
     # import qm9 dataset
@@ -99,3 +142,5 @@ def percentage_unique(smiles):
     unique = [smile in full_qm9_smiles_list for smile in smiles]
     pcnt_unique = (len(unique)-sum(unique))/len(unique)
     return pcnt_unique
+
+

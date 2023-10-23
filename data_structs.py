@@ -231,7 +231,7 @@ def canonicalize_smiles_from_file(fname):
         print("{} SMILES retrieved".format(len(smiles_list)))
         return smiles_list
 
-def filter_mol(mol, max_heavy_atoms=10, min_heavy_atoms=0, element_list=[6,7,8,9,16,17,35]):
+def filter_mol(mol, max_heavy_atoms=200, min_heavy_atoms=0, element_list=[5,6,7,8,9,15,16,17,35]):
     """Filters molecules on number of heavy atoms and atom types"""
     if mol is not None:
         num_heavy = min_heavy_atoms<mol.GetNumHeavyAtoms()<max_heavy_atoms

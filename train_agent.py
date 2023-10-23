@@ -10,17 +10,17 @@ from shutil import copyfile
 from model import RNN
 from data_structs import Vocabulary, Experience
 from scoring_functions import get_scoring_function
-from utils import Variable, seq_to_smiles, fraction_valid_smiles, unique, sa_score, percentage_easy_sa, percentage_unique
+from utils import Variable, seq_to_smiles, fraction_valid_smiles, unique, sa_score, percentage_easy_sa, percentage_unique, check_and_save_smiles
 from vizard_logger import VizardLog
-#from scipy.stats import levy
+from scipy.stats import levy
 
 def train_agent(restore_prior_from='data/Prior.ckpt',
                 restore_agent_from='data/Prior.ckpt',
                 scoring_function='tanimoto',
                 scoring_function_kwargs=None,
                 save_dir=None, learning_rate=0.0005,
-                batch_size=64, n_steps=3000,
-                num_processes=0, sigma=60,sigma_mode='static',
+                batch_size=16, n_steps=3000,
+                num_processes=0, sigma=20,sigma_mode='static',
                 experience_replay=0):
     print('started training')
     print('sigma used: ' + str(sigma))
@@ -51,7 +51,7 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
     optimizer = torch.optim.Adam(Agent.rnn.parameters(), lr=0.0005)
 
     # Scoring_function
-    scoring_function = get_scoring_function(scoring_function=scoring_function, num_processes=num_processes,
+    scoring_function = get_scoring_function(scoring_function=scoring_function, num_processes=num_processes, batch_size=batch_size,
                                             **scoring_function_kwargs)
 
     # For policy based RL, we normally train on-policy and correct for the fact that more likely actions
@@ -65,6 +65,10 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
     logger.log(Agent.rnn.embedding.weight.cpu().data.numpy()[::30], "init_weight_GRU_embedding")
     logger.log(Agent.rnn.gru_2.bias_ih.cpu().data.numpy(), "init_weight_GRU_layer_2_b_ih")
     logger.log(Agent.rnn.gru_2.bias_hh.cpu().data.numpy(), "init_weight_GRU_layer_2_b_hh")
+
+
+    with open("data/mols_filtered.smi", 'r') as f:
+        smiles_set = set(line.strip() for line in f)
 
     # Information for the logger
     step_score = [[], []]
@@ -92,21 +96,18 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         smiles = seq_to_smiles(seqs, voc)
         score = scoring_function(smiles)
 
-        # Update sigma if needed
+        # Sigma updating scheme
         if sigma_mode == 'linear_decay':
             rate = 0.1
             sigma = 30-rate*step
-            sigmas.append(sigma)
 
         if sigma_mode == 'exponential_decay':
             rate = 0.1
             sigma = 30 * (1 - rate)**step
-            sigmas.append(sigma)
 
         if sigma_mode == 'levy_flight':
             x = np.random.random(1)[0]
             sigma = int(levy.pdf(x)*100)
-            sigmas.append(sigma)
         
         if sigma_mode == 'adaptive':
             threshold = 0.6
@@ -117,20 +118,17 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
                 sigma = int(sigma*(1-mean_score))
             else:
                 sigma = int(sigma*1/(1-mean_score))
-            print(sigma)
-            sigmas.append(sigma)
 
         if sigma_mode == 'uncertainty_aware':
             uncertainty = np.std(score)
-            print(uncertainty)
-            sigma = int(sigma * uncertainty*5)
-            sigmas.append(sigma)
+            sigma = int(sigma * uncertainty*5) # there's obviously a better way to scale sigma with uncertainty, play around with this
 
         if sigma_mode == 'uncertainty_aware_inverse':
             uncertainty = np.std(score)
-            print(uncertainty)
             sigma = int(sigma / uncertainty)
-            sigmas.append(sigma)
+            
+        
+        sigmas.append(sigma)
 
         # Ideas: learn sigma???
         # just add explicit term to loss func? 
@@ -178,7 +176,8 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         print("\n       Step {}   Fraction valid SMILES: {:4.1f}  Time elapsed: {:.2f}h Time left: {:.2f}h".format(
               step, fraction_valid_smiles(smiles) * 100, time_elapsed, time_left))
         print("  Agent    Prior   Target   Score             SMILES")
-        for i in range(10):
+        #for i in range(10):
+        for i in range(len(smiles)):
             print(" {:6.2f}   {:6.2f}  {:6.2f}  {:6.2f}     {}".format(agent_likelihood[i],
                                                                        prior_likelihood[i],
                                                                        augmented_likelihood[i],
@@ -199,9 +198,10 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
                             (smiles[:12], score[:12])]), "SMILES", dtype="text", overwrite=True)
         logger.log(np.array(step_score), "Scores")
 
-        # Log SMILES features
-        sa.append(percentage_easy_sa(smiles))
-        novel.append(percentage_unique(smiles))
+        # Log SMILES diagnostics
+        #sa.append(percentage_easy_sa(smiles))
+        novel.append(check_and_save_smiles(smiles, smiles_set, present_filepath="present_smiles.smi", absent_filepath="absent_smiles.smi"))
+        #novel.append(percentage_unique(smiles))
         valid.append(fraction_valid_smiles(smiles))
         scores.append(np.mean(score))
 
@@ -223,6 +223,7 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
     smiles = seq_to_smiles(seqs, voc)
     score = scoring_function(smiles)
 
+    # Log diagnostics 
     np.save(os.path.join(save_dir,'training_log_sa.npy'), np.array(sa))
     np.save(os.path.join(save_dir,'training_log_novel.npy'), np.array(novel))
     np.save(os.path.join(save_dir,'training_log_valid.npy'), np.array(valid))

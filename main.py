@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import argparse
 import time
 import os
@@ -24,7 +23,7 @@ parser.add_argument('--learning-rate', action='store', dest='learning_rate',
 parser.add_argument('--num-steps', action='store', dest='n_steps', type=int,
                     default=3000)
 parser.add_argument('--batch-size', action='store', dest='batch_size', type=int,
-                    default=64)
+                    default=16)
 parser.add_argument('--sigma_mode', action='store', dest='sigma_mode', type=str, choices=['static', 'linear_decay', 'exponential_decay', 'levy_flight', 'uncertainty_aware', 'uncertainty_aware_inverse', 'adaptive'], default='static')
 parser.add_argument('--sigma', action='store', dest='sigma', type=int,
                     default=20)

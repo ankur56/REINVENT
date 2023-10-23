@@ -1,0 +1,11 @@
+Reading smiles...
+0 lines processed.
+100000 lines processed.
+200000 lines processed.
+300000 lines processed.
+400000 lines processed.
+471067 SMILES retrieved
+Constructing vocabulary...
+Number of characters: 23
+207.45user 9.90system 3:26.81elapsed 105%CPU (0avgtext+0avgdata 167500maxresident)k
+52inputs+50200outputs (0major+42858minor)pagefaults 0swaps
