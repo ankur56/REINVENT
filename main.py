@@ -7,7 +7,7 @@ from train_agent import train_agent
 
 parser = argparse.ArgumentParser(description="Main script for running the model")
 parser.add_argument('--scoring-function', action='store', dest='scoring_function',
-                    choices=['activity_model', 'tanimoto', 'no_sulphur', 'bandgap_range', 'bandgap_range_soft'],
+                    choices=['activity_model', 'tanimoto', 'no_sulphur', 'bandgap_range', 'bandgap_distance','bandgap_range_soft'],
                     default='tanimoto',
                     help='What type of scoring function to use.')
 parser.add_argument('--scoring-function-kwargs', action='store', dest='scoring_function_kwargs',
@@ -24,7 +24,7 @@ parser.add_argument('--num-steps', action='store', dest='n_steps', type=int,
                     default=3000)
 parser.add_argument('--batch-size', action='store', dest='batch_size', type=int,
                     default=16)
-parser.add_argument('--sigma_mode', action='store', dest='sigma_mode', type=str, choices=['static', 'linear_decay', 'exponential_decay', 'levy_flight', 'uncertainty_aware', 'uncertainty_aware_inverse', 'adaptive'], default='static')
+parser.add_argument('--sigma_mode', action='store', dest='sigma_mode', type=str, choices=['static', 'linear_decay', 'exponential_decay', 'levy_flight', 'uncertainty_aware', 'uncertainty_aware_inverse', 'adaptive', 'prior'], default='static')
 parser.add_argument('--sigma', action='store', dest='sigma', type=int,
                     default=20)
 #parser.add_argument('--sigma', action='store', dest='sigma', type=float,

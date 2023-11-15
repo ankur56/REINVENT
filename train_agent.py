@@ -127,6 +127,12 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
             uncertainty = np.std(score)
             sigma = int(sigma / uncertainty)
             
+        if sigma_mode == 'prior':
+            score_bandgap = scoring_function(smiles)
+            score = score_bandgap[:,0]
+            bandgap = score_bandgap[:, 1]
+            lambda_ = 1
+            sigma = lambda_*np.abs(prior_likelihood)
         
         sigmas.append(sigma)
 

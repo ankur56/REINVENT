@@ -63,7 +63,28 @@ class bandgap_range():
             in_range = (bandgap < 4.0 and bandgap > 2.0)
             return float(in_range)
         return -1.0
-    
+
+class bandgap_distance():
+
+    kwargs = []
+
+    def __init__(self):
+        pass
+    def __call__(self, smile):
+        mol = Chem.MolFromSmiles(smile)
+        if mol:
+            csmile = Chem.MolToSmiles(mol)
+            bandgap = get_bandgap_unique(csmile)
+            target_range = np.array([2,4])
+            target_mean = np.mean(target_range)
+           # delta = 1 / (1 + np.abs(bandgap - target_mean))
+            delta = 1 / (1 + (bandgap - target_mean)**2)
+            #in_range = (bandgap < 4.0 and bandgap > 2.0)
+            #print ('this prints', in_range, bandgap)
+            return float(delta), bandgap
+            
+        return -1.0, -1.0
+
 class bandgap_range_soft():
     """Scores structures based band gap values within a certain target range."""
 
@@ -216,7 +237,7 @@ class Singleprocessing():
 
 def get_scoring_function(scoring_function, num_processes=None, batch_size=16, **kwargs):
     """Function that initializes and returns a scoring function by name"""
-    scoring_function_classes = [no_sulphur, tanimoto, activity_model, bandgap_range, bandgap_range_soft]
+    scoring_function_classes = [no_sulphur, tanimoto, activity_model, bandgap_range, bandgap_distance, bandgap_range_soft]
     scoring_functions = [f.__name__ for f in scoring_function_classes]
     scoring_function_class = [f for f in scoring_function_classes if f.__name__ == scoring_function][0]
 
