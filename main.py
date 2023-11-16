@@ -24,7 +24,7 @@ parser.add_argument('--num-steps', action='store', dest='n_steps', type=int,
                     default=3000)
 parser.add_argument('--batch-size', action='store', dest='batch_size', type=int,
                     default=16)
-parser.add_argument('--sigma_mode', action='store', dest='sigma_mode', type=str, choices=['static', 'linear_decay', 'exponential_decay', 'levy_flight', 'uncertainty_aware', 'uncertainty_aware_inverse', 'adaptive', 'prior'], default='static')
+parser.add_argument('--sigma_mode', action='store', dest='sigma_mode', type=str, choices=['static', 'linear_decay', 'exponential_decay', 'levy_flight', 'uncertainty_aware', 'uncertainty_aware_inverse', 'adaptive', 'prior', 'prior_reward', 'prior_greedy', 'prior_reward_greedy'], default='static')
 parser.add_argument('--sigma', action='store', dest='sigma', type=int,
                     default=20)
 #parser.add_argument('--sigma', action='store', dest='sigma', type=float,

@@ -134,13 +134,69 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
             lambda_ = 1
             sigma = lambda_*np.abs(prior_likelihood)
         
+        
+        batch_reward = 0
+        if sigma_mode == 'prior_reward':
+        
+            score_bandgap = scoring_function(smiles)
+            score = score_bandgap[:,0]
+            bandgap = score_bandgap[:, 1]
+            
+            batch_score = sum(2 <= b <= 4 for b in bandgap)
+            #batch_score = sum(max(0, 2 - val, val - 4)**2 for val in bandgap)
+
+            alpha=1
+            batch_reward = np.abs(prior_likelihood)*(1 - np.exp(-alpha*batch_score))
+
+            lambda_=1
+            sigma = lambda_*np.abs(prior_likelihood)
+            
+        if sigma_mode == 'prior_greedy':
+            score_bandgap = scoring_function(smiles)
+            score = score_bandgap[:,0]
+            bandgap = score_bandgap[:, 1]
+            lambda_ = 1
+            
+            sigma = lambda_*np.abs(prior_likelihood)
+            
+            r = np.random.uniform(0, 1)
+
+            epsilon = 0.1
+            if r < epsilon:
+            	prior_orig = prior_likelihood.clone()
+            	prior_likelihood = torch.from_numpy(np.zeros((len(prior_orig),)))
+            	sigma = lambda_*np.abs(prior_orig)
+
+            	
+           
+        if sigma_mode == 'prior_reward_greedy':
+        
+            score_bandgap = scoring_function(smiles)
+            score = score_bandgap[:,0]
+            bandgap = score_bandgap[:, 1]
+            
+            batch_score = sum(2 <= b <= 4 for b in bandgap)
+            #batch_score = sum(max(0, 2 - val, val - 4)**2 for val in bandgap)
+
+            alpha=1
+            batch_reward = np.abs(prior_likelihood)*(1 - np.exp(-alpha*batch_score))
+
+            lambda_=1
+            sigma = lambda_*np.abs(prior_likelihood)
+            
+            r = np.random.uniform(0, 1)
+            epsilon = 0.1
+            if r < epsilon:
+            	prior_orig = np.copy(prior_likelihood)
+            	prior_likelihood = torch.from_numpy(np.zeros((len(prior_orig),)))
+            	sigma = lambda_*np.abs(prior_orig)
+            	batch_reward = np.abs(prior_orig)*(1 - np.exp(-alpha*batch_score))
+        
+        
         sigmas.append(sigma)
 
-        # Ideas: learn sigma???
-        # just add explicit term to loss func? 
-
         # Calculate augmented likelihood
-        augmented_likelihood = prior_likelihood + sigma * Variable(score)
+        augmented_likelihood = prior_likelihood + sigma * Variable(score) + batch_reward
         #augmented_likelihood = (1 - sigma) * prior_likelihood + sigma * Variable(score)
         loss = torch.pow((augmented_likelihood - agent_likelihood), 2)
 

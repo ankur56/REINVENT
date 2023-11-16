@@ -1,12 +1,2 @@
-c1ccc2c(c1)[nH]c1c2ccc2c1sc1cnc3c4cc5ccoc5cc4sc3c12	1.0
-c1ccc2c(c1)sc1c2[nH]c2sc3c4[nH]ccc4sc3c21	1.0
-c1cc2c([nH]1)oc1cc3c(cc12)sc1c3sc2c1-c1cc3c[nH]cc3cc1-2	0.0
-c1ccc2c(c1)sc1cc3c(cc12)[nH]c1c3[nH]c2[nH]c3c4ccccc4sc3c21	1.0
-c1ccc2c(c1)sc1c2[nH]c2sc3c4cc5cc6[nH]ccc6cc5cc4sc3c21	1.0
-c1ccc2c(c1)c1cc[nH]c1c1c2cnc2c1oc1sc3oc4[nH]ccc4c3c12	1.0
-c1ccc2c(c1)oc1c2cnc2c1[nH]c1c2[nH]c2oc3oc4ccccc4c3c21	1.0
-c1ccc2c(c1)c1sc3c4cc5occc5cc4c4ccccc4c3c1c1ccoc21	0.0
-c1ccc2c(c1)[nH]c1c3[nH]c4occc4c3c3c4cc[nH]c4sc3c21	1.0
-c1ccc2c(c1)[nH]c1ccc3c4cc5cc6cc[nH]c6cc5cc4sc3c12	1.0
-c1ccc2c(c1)c1[nH]ccc1c1c2oc2sc3ncccc3c21	1.0
-c1ccc2c(c1)c1ccsc1c1cc3cc4c(cc3cc21)oc1oc2ccccc2c14	0.0
+b1ccbc2c1c1ccccc1c1ccc3[nH]c4c(c3c21)BC1=C(BC=C1)B4	0.1
+B1c2ccccc2-c2c1cnc1cc3c(cc21)-c1nc2ccc4c5cc6ccccc6cc5ccc4c2nc1-3	0.12

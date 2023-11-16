@@ -441,3 +441,6 @@ c1cnc2cc3ccc4oc5ccccc5c4c3cc2c1
 c1ccc2c(c1)ccc1cc3c(cc12)[nH]c1c3ccc2[nH]c3ccccc3c21
 c1ccc2c(c1)ccc1c3cc4cc[nH]c4cc3c3cc4[nH]ccc4cc3c21
 c1ccc2c(c1)c1cscc1c1[nH]ccc21
+b1ccbc2cc3cc4cc5cscc5cc4cc3cc12
+c1ccc2c(c1)c1ccccc1c1cc3nc4c(ccc5nccnc54)nc3cc21
+c1ccc2cc3c(ccc4c5ccc6ccccc6c5c5ccccc5c34)cc2c1
