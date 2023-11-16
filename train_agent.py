@@ -94,8 +94,11 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         # Get prior likelihood and score
         prior_likelihood, _ = Prior.likelihood(Variable(seqs))
         smiles = seq_to_smiles(seqs, voc)
-        score = scoring_function(smiles)
-
+        #score = scoring_function(smiles)
+        score_bandgap = scoring_function(smiles)
+        score = score_bandgap[:,0]
+        bandgap = score_bandgap[:, 1]
+        
         # Sigma updating scheme
         if sigma_mode == 'linear_decay':
             rate = 0.1
@@ -129,8 +132,6 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
             
         if sigma_mode == 'prior':
             score_bandgap = scoring_function(smiles)
-            score = score_bandgap[:,0]
-            bandgap = score_bandgap[:, 1]
             lambda_ = 1
             sigma = lambda_*np.abs(prior_likelihood)
         
@@ -138,10 +139,6 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         batch_reward = 0
         if sigma_mode == 'prior_reward':
         
-            score_bandgap = scoring_function(smiles)
-            score = score_bandgap[:,0]
-            bandgap = score_bandgap[:, 1]
-            
             batch_score = sum(2 <= b <= 4 for b in bandgap)
             #batch_score = sum(max(0, 2 - val, val - 4)**2 for val in bandgap)
 
@@ -152,9 +149,7 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
             sigma = lambda_*np.abs(prior_likelihood)
             
         if sigma_mode == 'prior_greedy':
-            score_bandgap = scoring_function(smiles)
-            score = score_bandgap[:,0]
-            bandgap = score_bandgap[:, 1]
+
             lambda_ = 1
             
             sigma = lambda_*np.abs(prior_likelihood)
@@ -170,11 +165,7 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
             	
            
         if sigma_mode == 'prior_reward_greedy':
-        
-            score_bandgap = scoring_function(smiles)
-            score = score_bandgap[:,0]
-            bandgap = score_bandgap[:, 1]
-            
+                    
             batch_score = sum(2 <= b <= 4 for b in bandgap)
             #batch_score = sum(max(0, 2 - val, val - 4)**2 for val in bandgap)
 
