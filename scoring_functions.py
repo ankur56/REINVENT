@@ -14,6 +14,7 @@ import re
 import threading
 import pexpect
 from concurrent.futures import ProcessPoolExecutor
+from functools import partial
 rdBase.DisableLog('rdApp.error')
 
 """Scoring function should be a class where some tasks that are shared for every call
@@ -55,14 +56,14 @@ class bandgap_range():
 
     def __init__(self):
         pass
-    def __call__(self, smile):
+    def __call__(self, smile, upper_limit=3.0, lower_limit=2.0, xtb_run='extras'):
         mol = Chem.MolFromSmiles(smile)
         if mol:
             csmile = Chem.MolToSmiles(mol)
-            bandgap = get_bandgap_unique(csmile)
-            in_range = (bandgap < 4.0 and bandgap > 2.0)
-            return float(in_range)
-        return -1.0
+            bandgap = get_bandgap_unique(csmile, xtb_run)
+            in_range = (bandgap < upper_limit and bandgap > lower_limit)
+            return float(in_range), bandgap
+        return -1.0, -1.0
 
 class bandgap_distance():
 
@@ -70,12 +71,12 @@ class bandgap_distance():
 
     def __init__(self):
         pass
-    def __call__(self, smile):
+    def __call__(self, smile, upper_limit=3.0, lower_limit=2.0, xtb_run='extras'):
         mol = Chem.MolFromSmiles(smile)
         if mol:
             csmile = Chem.MolToSmiles(mol)
-            bandgap = get_bandgap_unique(csmile)
-            target_range = np.array([2,4])
+            bandgap = get_bandgap_unique(csmile, xtb_run)
+            target_range = np.array([lower_limit, upper_limit])
             target_mean = np.mean(target_range)
            # delta = 1 / (1 + np.abs(bandgap - target_mean))
             delta = 1 / (1 + (bandgap - target_mean)**2)
@@ -225,17 +226,26 @@ class Multiprocessing():
 class Singleprocessing():
     """Adds an option to not spawn new processes for the scoring functions, but rather
        run them in the main process."""
-    def __init__(self, scoring_function=None, batch_size=16):
+    def __init__(self, scoring_function=None, batch_size=16, upper_limit=3.0, lower_limit=2.0, xtb_run='extras'):
         self.scoring_function = scoring_function()
         self.batch_size = batch_size
+        self.upper_limit = upper_limit
+        self.lower_limit = lower_limit
+        self.xtb_run = xtb_run
     def __call__(self, smiles):
         print("Batch Size: ", self.batch_size, flush=True)
+        print("Upper Limit: ", self.upper_limit, flush=True)
+        print("Lower Limit: ", self.lower_limit, flush=True)
+        # Define a lambda or helper function that includes the additional arguments
+        #scoring_func_with_limits = lambda smile: self.scoring_function(smile, self.upper_limit, self.lower_limit)
+        scoring_func_with_limits = partial(self.scoring_function, upper_limit=self.upper_limit, lower_limit=self.lower_limit, xtb_run=self.xtb_run)
         with ProcessPoolExecutor(max_workers=self.batch_size) as executor:
-            scores = list(executor.map(self.scoring_function, smiles))
+            #scores = list(executor.map(self.scoring_function, smiles))
+            scores = list(executor.map(scoring_func_with_limits, smiles))
         #scores = [self.scoring_function(smile) for smile in smiles]
         return np.array(scores, dtype=np.float32)
 
-def get_scoring_function(scoring_function, num_processes=None, batch_size=16, **kwargs):
+def get_scoring_function(scoring_function, num_processes=None, batch_size=16, upper_limit=3.0, lower_limit=2.0, xtb_run='extras', **kwargs):
     """Function that initializes and returns a scoring function by name"""
     scoring_function_classes = [no_sulphur, tanimoto, activity_model, bandgap_range, bandgap_distance, bandgap_range_soft]
     scoring_functions = [f.__name__ for f in scoring_function_classes]
@@ -249,5 +259,5 @@ def get_scoring_function(scoring_function, num_processes=None, batch_size=16, **
             setattr(scoring_function_class, k, v)
 
     if num_processes == 0:
-        return Singleprocessing(scoring_function=scoring_function_class, batch_size=batch_size)
+        return Singleprocessing(scoring_function=scoring_function_class, batch_size=batch_size, upper_limit=upper_limit, lower_limit=lower_limit, xtb_run=xtb_run)
     return Multiprocessing(scoring_function=scoring_function, num_processes=num_processes)

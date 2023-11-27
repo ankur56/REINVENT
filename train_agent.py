@@ -19,9 +19,9 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
                 scoring_function='tanimoto',
                 scoring_function_kwargs=None,
                 save_dir=None, learning_rate=0.0005,
-                batch_size=16, n_steps=3000,
-                num_processes=0, sigma=20,sigma_mode='static',
-                experience_replay=0):
+                batch_size=16, lb=2, ub=3, n_steps=3000,
+                num_processes=0, sigma=20, sigma_mode='static',
+                lambda_1=2, lambda_2=2, experience_replay=0):
     print('started training')
     print('sigma used: ' + str(sigma))
     print('sigma mode: ' + sigma_mode)
@@ -50,8 +50,14 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
 
     optimizer = torch.optim.Adam(Agent.rnn.parameters(), lr=0.0005)
 
+    if sigma_mode == 'static':
+        xtb_run = 'run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_s_' + str(sigma) + '_bs_' + str(batch_size)+ '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps) + '_l2_' + str(lambda_2)
+    else:
+        xtb_run = 'run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_l1_' + str(lambda_1) + '_bs_' + str(batch_size) + '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps) + '_l2_' + str(lambda_2)
+
+
     # Scoring_function
-    scoring_function = get_scoring_function(scoring_function=scoring_function, num_processes=num_processes, batch_size=batch_size,
+    scoring_function_call = get_scoring_function(scoring_function=scoring_function, num_processes=num_processes, batch_size=batch_size, upper_limit=ub, lower_limit=lb, xtb_run=xtb_run,
                                             **scoring_function_kwargs)
 
     # For policy based RL, we normally train on-policy and correct for the fact that more likely actions
@@ -77,6 +83,8 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
     valid = []
     scores = []
     sigmas = []
+    standard_score = []
+    save_every_n = 25
 
     print("Model initialized, starting training...")
 
@@ -94,10 +102,12 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         # Get prior likelihood and score
         prior_likelihood, _ = Prior.likelihood(Variable(seqs))
         smiles = seq_to_smiles(seqs, voc)
-        #score = scoring_function(smiles)
-        score_bandgap = scoring_function(smiles)
-        score = score_bandgap[:,0]
+
+        score_bandgap = scoring_function_call(smiles)
+        score = score_bandgap[:, 0]
         bandgap = score_bandgap[:, 1]
+        
+        batch_score = sum(lb < b < ub for b in bandgap)
         
         # Sigma updating scheme
         if sigma_mode == 'linear_decay':
@@ -129,65 +139,56 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         if sigma_mode == 'uncertainty_aware_inverse':
             uncertainty = np.std(score)
             sigma = int(sigma / uncertainty)
-            
+
         if sigma_mode == 'prior':
-            score_bandgap = scoring_function(smiles)
-            lambda_ = 1
-            sigma = lambda_*np.abs(prior_likelihood)
-        
-        
-        batch_reward = 0
-        if sigma_mode == 'prior_reward':
-        
-            batch_score = sum(2 <= b <= 4 for b in bandgap)
-            #batch_score = sum(max(0, 2 - val, val - 4)**2 for val in bandgap)
+            #lambda_1 = 2
+            sigma = np.zeros_like(bandgap)
 
-            alpha=1
-            batch_reward = np.abs(prior_likelihood)*(1 - np.exp(-alpha*batch_score))
+            for i, (b, prior) in enumerate(zip(bandgap, prior_likelihood)):
+                if lb < b < ub:
+                    sigma[i] = lambda_1 * np.abs(prior)
+            sigma = torch.from_numpy(sigma)
 
-            lambda_=1
-            sigma = lambda_*np.abs(prior_likelihood)
-            
+
         if sigma_mode == 'prior_greedy':
+            #lambda_1 = 2
+            sigma = np.zeros_like(bandgap)
 
-            lambda_ = 1
-            
-            sigma = lambda_*np.abs(prior_likelihood)
-            
+            for i, (b, prior) in enumerate(zip(bandgap, prior_likelihood)):
+                if lb < b < ub:
+                    sigma[i] = lambda_1 * np.abs(prior)
+            sigma = torch.from_numpy(sigma)
+
             r = np.random.uniform(0, 1)
 
-            epsilon = 0.1
+            epsilon = max(0.9 - 0.1 * step, 0.1)
+
             if r < epsilon:
-            	prior_orig = prior_likelihood.clone()
-            	prior_likelihood = torch.from_numpy(np.zeros((len(prior_orig),)))
-            	sigma = lambda_*np.abs(prior_orig)
-
-            	
-           
-        if sigma_mode == 'prior_reward_greedy':
-                    
-            batch_score = sum(2 <= b <= 4 for b in bandgap)
-            #batch_score = sum(max(0, 2 - val, val - 4)**2 for val in bandgap)
-
-            alpha=1
-            batch_reward = np.abs(prior_likelihood)*(1 - np.exp(-alpha*batch_score))
-
-            lambda_=1
-            sigma = lambda_*np.abs(prior_likelihood)
-            
-            r = np.random.uniform(0, 1)
-            epsilon = 0.1
-            if r < epsilon:
-            	prior_orig = np.copy(prior_likelihood)
-            	prior_likelihood = torch.from_numpy(np.zeros((len(prior_orig),)))
-            	sigma = lambda_*np.abs(prior_orig)
-            	batch_reward = np.abs(prior_orig)*(1 - np.exp(-alpha*batch_score))
+               	prior_orig = prior_likelihood.clone()
+               	prior_likelihood = torch.from_numpy(np.zeros((len(prior_orig),)))
+               	sigma = np.zeros_like(bandgap)
+                for i, (b, prior) in enumerate(zip(bandgap, prior_likelihood)):
+                    if lb < b < ub:
+                        sigma[i] = lambda_1 * np.abs(prior)
+                sigma = torch.from_numpy(sigma)
         
-        
+
+        def h(bgap):
+            if bgap < lb:
+                return (lb - bgap) ** 2
+            elif bgap > ub:
+                return (bgap - ub) ** 2
+            else:
+                return 0
+
+        p = torch.from_numpy(np.array([h(bg) for bg in bandgap]))
         sigmas.append(sigma)
 
+        print(len([val for val in bandgap if val < ub and val > lb])/len(bandgap))
+
         # Calculate augmented likelihood
-        augmented_likelihood = prior_likelihood + sigma * Variable(score) + batch_reward
+        #augmented_likelihood = prior_likelihood + sigma * Variable(score) + batch_reward
+        augmented_likelihood = prior_likelihood + (sigma * Variable(score)) - (lambda_2*p)
         #augmented_likelihood = (1 - sigma) * prior_likelihood + sigma * Variable(score)
         loss = torch.pow((augmented_likelihood - agent_likelihood), 2)
 
@@ -257,36 +258,63 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         #novel.append(percentage_unique(smiles))
         valid.append(fraction_valid_smiles(smiles))
         scores.append(np.mean(score))
+        standard_score.append(batch_score/batch_size)
+        if not save_dir:
+            if sigma_mode == 'static': 
+                save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_s_' + str(sigma) + '_bs_' + str(batch_size)+ '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps) + '_l2_' + str(lambda_2)
+            else:
+                save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_l1_' + str(lambda_1) + '_bs_' + str(batch_size) + '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps) + '_l2_' + str(lambda_2)
+            #else:
+            #    save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode
 
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+
+        if step % save_every_n == save_every_n - 1:
+            np.save(os.path.join(save_dir,'training_log_novel.npy'), np.array(novel))
+            np.save(os.path.join(save_dir,'training_log_valid.npy'), np.array(valid))
+            np.save(os.path.join(save_dir,'training_log_scores.npy'), np.array(scores))
+            np.save(os.path.join(save_dir,'training_log_st_scores.npy'), np.array(standard_score))
+            #np.save(os.path.join(save_dir,'training_log_sigmas.npy'), np.array(sigmas))
 
     # If the entire training finishes, we create a new folder where we save this python file
     # as well as some sampled sequences and the contents of the experinence (which are the highest
     # scored sequences seen during training)
     if not save_dir:
-        save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime())
-    os.makedirs(save_dir)
+        if sigma_mode == 'static': 
+            save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_s_' + str(sigma) + '_bs_' + str(batch_size) + '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps) + '_l2_' + str(lambda_2)
+        else:
+            save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_l1_' + str(lambda_) + '_bs_' + str(batch_size) + '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps) + '_l2_' + str(lambda_2)
+        #else:
+        #    save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode
+    
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    
     copyfile('train_agent.py', os.path.join(save_dir, "train_agent.py"))
 
     experience.print_memory(os.path.join(save_dir, "memory"))
     torch.save(Agent.rnn.state_dict(), os.path.join(save_dir, 'Agent.ckpt'))
 
-    seqs, agent_likelihood, entropy = Agent.sample(256)
+    seqs, agent_likelihood, entropy = Agent.sample(16)
     prior_likelihood, _ = Prior.likelihood(Variable(seqs))
     prior_likelihood = prior_likelihood.data.cpu().numpy()
     smiles = seq_to_smiles(seqs, voc)
-    score = scoring_function(smiles)
-
+    score_bg2 = scoring_function_call(smiles)
+    score2 = score_bg2[:, 0]
+    
     # Log diagnostics 
-    np.save(os.path.join(save_dir,'training_log_sa.npy'), np.array(sa))
+    #np.save(os.path.join(save_dir,'training_log_sa.npy'), np.array(sa))
     np.save(os.path.join(save_dir,'training_log_novel.npy'), np.array(novel))
     np.save(os.path.join(save_dir,'training_log_valid.npy'), np.array(valid))
     np.save(os.path.join(save_dir,'training_log_scores.npy'), np.array(scores))
-    np.save(os.path.join(save_dir,'training_log_sigmas.npy'), np.array(sigmas))
+    np.save(os.path.join(save_dir,'training_log_st_scores.npy'), np.array(standard_score))
+    #np.save(os.path.join(save_dir,'training_log_sigmas.npy'), np.array(sigmas))
 
     with open(os.path.join(save_dir, "sampled"), 'w') as f:
         f.write("SMILES Score PriorLogP\n")
-        for smiles, score, prior_likelihood in zip(smiles, score, prior_likelihood):
-            f.write("{} {:5.2f} {:6.2f}\n".format(smiles, score, prior_likelihood))
+        for smiles, score2, prior_likelihood in zip(smiles, score2, prior_likelihood):
+            f.write("{} {:5.2f} {:6.2f}\n".format(smiles, score2, prior_likelihood))
 
 if __name__ == "__main__":
     train_agent()

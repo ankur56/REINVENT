@@ -1,0 +1,17 @@
+SMILES Score PriorLogP
+c1ccc2c(c1)[nH]c1c3[nH]c4c(sc5c6c7sccc7ccc6ccc54)c3c3c(oc4c3sc3oc5c6sc7ccccc7c6ccc5c43)c12  0.96 -99.00
+c1ccc2c(c1)oc1c3oc4c(sc5c6sc7ccccc7c6ccc54)c3c3[nH]c4c(oc5c6sc7ccoc7c6ccc54)c3c12  0.96 -94.73
+c1ccc2c(c1)sc1c3oc4sc5c6c(ccsc7ccc8ccoc78)c6ccc5c4c3c3c(sc4c3sc3oc5c6sc7ccoc7c6ccc5c43)c12 -1.00 -114.21
+c1ccc2c(c1)oc1c3oc4sc5c6c7occc7ccc6ccc5c4c3c3c(oc4c3sc3oc5c6oc7ccoc7c6ccc5c43)c12  0.98 -96.35
+c1ccc2c(c1)sc1c3oc4c(oc5c6oc7ccoc7c6ccc54)c3c3c(oc4c3sc3oc5c6oc7[nH]ccc7c6ccc5c43)c12  0.95 -98.71
+c1ccc2c(c1)oc1c3oc4[nH]c5c6sc7ccoc7c6ccc5c4c3c3c(oc4c3sc3sc5c6sc7ccsc7c6ccc5c43)c12  0.96 -92.85
+c1ccc2c(c1)sc1c3oc4c(sc5c6sc7ccoc7c6ccc54)c3c3c([nH]c4c3oc3sc5c6sc7ccoc7c6ccc5c43)c12  0.90 -101.62
+c1ccc2c(c1)sc1c3oc4oc5c6c7[nH]ccc7sc6ccc5c4c3c3c(oc4c3sc3oc5c6oc7ccoc7c6ccc5c43)c12  1.00 -93.62
+c1ccc2c(c1)oc1c3[nH]c4c(sc5c6c7occc7ccc6ccc54)c3c3c(sc4c3sc3sc5c6oc7ccoc7c6ccc5c43)c12  0.96 -102.46
+c1ccc2c(c1)oc1c3oc4c(sc5c6c7sccc7ccc6ccc54)c3c3c([nH]c4c3oc3oc5c6oc7ccsc7c6ccc5c43)c12  0.97 -100.14
+c1ccc2c(c1)sc1c3oc4[nH]c5c6sc7ccccc7c6ccc5c4c3c3c(oc4c3sc3oc5c6c7sccc7sc6ccc5c43)c12  0.97 -92.84
+c1ccc2c(c1)[nH]c1c3oc4c(oc5c6c7occc7ccc6ccc54)c3c3c(oc4c3oc3oc5c6c7sccc7ccc6ccc5c43)c12  1.00 -102.96
+c1ccc2c(c1)oc1c3oc4c(oc5c6oc7ccoc7c6ccc54)c3c3c(oc4c3oc3sc5c6c7occc7ccc6ccc5c43)c12  0.99 -101.79
+c1ccc2c(c1)oc1c3oc4c([nH]c5c6c7sccc7ccc6ccc54)c3c3c(oc4c3sc3sc5c6sc7ccoc7c6ccc5c43)c12  0.96 -100.71
+c1ccc2c(c1)sc1c3oc4c(oc5c6[nH]c7occc7c6ccc54)c3c3c(oc4c3sc3oc5c6c7ccoc7ccc6ccc5c43)c12  0.97 -98.51
+c1ccc2c(c1)oc1c3oc4oc5c6sc7ccoc7c6ccc5c4c3c3c(oc4c3oc3oc5c6oc7ccsc7c6ccc5c43)c12  0.98 -91.76

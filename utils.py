@@ -117,17 +117,17 @@ def check_and_save_smiles(smiles, smiles_set, present_filepath="present_smiles.s
     absent_smiles = [smi for smi in csmiles if smi not in smiles_set]
 
     # Writing absent smiles
-    with open(absent_filepath, 'a') as f:
-        for smi in absent_smiles:
-            f.write(smi + "\n")
+    #with open(absent_filepath, 'a') as f:
+    #    for smi in absent_smiles:
+    #        f.write(smi + "\n")
 
     # If you need to write present smiles without calculating them explicitly,
     # you might create a set of absent_smiles and subtract it from the input smiles.
-    if present_filepath:
-        present_smiles = set(csmiles) - set(absent_smiles)  # set difference gives us the present smiles.
-        with open(present_filepath, 'a') as f:
-            for smi in present_smiles:
-                f.write(smi + "\n")
+    #if present_filepath:
+    #    present_smiles = set(csmiles) - set(absent_smiles)  # set difference gives us the present smiles.
+    #    with open(present_filepath, 'a') as f:
+    #        for smi in present_smiles:
+    #            f.write(smi + "\n")
 
     # Returning the number of absent smiles.
     return len(absent_smiles)/len(csmiles)

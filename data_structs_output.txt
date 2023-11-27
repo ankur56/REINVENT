@@ -1,9 +1,0 @@
-Reading smiles...
-0 lines processed.
-100000 lines processed.
-200000 lines processed.
-300000 lines processed.
-400000 lines processed.
-22 SMILES retrieved
-Constructing vocabulary...
-Number of characters: 11

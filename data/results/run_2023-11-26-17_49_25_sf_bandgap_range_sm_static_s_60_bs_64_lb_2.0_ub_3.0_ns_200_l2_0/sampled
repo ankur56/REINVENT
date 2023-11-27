@@ -1,0 +1,17 @@
+SMILES Score PriorLogP
+c1ccc2c(c1)c1ccoc1c1cc3[nH]c4c([nH]c5cc[nH]c54)c3cc21  1.00 -24.91
+c1ccc2c(c1)c1cc[nH]c1c1c3oc4c5[nH]ccc5oc4c3c3ccoc3c21  1.00 -24.62
+c1ccc2c(c1)ccc1sc3c4oc5oc6occc6c5c4sc3c12  1.00 -22.31
+c1ccc2c(c1)c1occc1c1sc3c(oc4c5sccc5sc43)c21  1.00 -25.01
+c1ccc2c(c1)c1occc1c1[nH]c3cc4cc5ccc6ccoc6c5cc4cc3c21  0.00 -19.70
+c1ccc2c(c1)c1c[nH]cc1c1oc3cc4oc5c6cc[nH]c6sc5c4cc3c21  1.00 -25.78
+c1ccc2c(c1)c1cc[nH]c1c1c2oc2oc3c(ccc4c5[nH]c6occc6c5[nH]c43)c21  1.00 -29.41
+c1ccc2c(c1)c1ccoc1c1c3c(sc21)c1c[nH]cc1c1[nH]c3c4oc5ccoc5c4oc3c21 -1.00 -49.37
+c1ccc2c(c1)ccc1c3ccc4oc5ccccc5c4c3c3occc3c21  0.00 -16.55
+c1ccc2c(c1)c1occc1c1oc3c4[nH]c5[nH]ccc5c4sc3c21  1.00 -22.85
+c1ccc2c(c1)oc1ccc3c4oc5sccc5c4oc3c12  0.00 -20.56
+c1ccc2c(c1)[nH]c1cc3sc4c5ccccc5ccc4c3cc12  0.00 -17.40
+c1ccc2c(c1)c1ccoc1c1c3oc4cc[nH]c4c3c3oc4ccoc4c3c21  1.00 -23.29
+c1ccc2c(c1)c1occc1c1sc3c(oc4c5occc5[nH]c43)c21  1.00 -25.08
+c1ccc2c(c1)c1c[nH]cc1c1cc3c(cc21)[nH]c1[nH]c2c4cocc4sc2c13  1.00 -25.86
+c1ccc2c(c1)ccc1sc3c4[nH]c5c6ccccc6oc5c4c4cocc4c3c12  0.00 -22.08

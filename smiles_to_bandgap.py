@@ -7,6 +7,7 @@ import os
 import subprocess
 import hashlib
 import logging
+import time
 
 #logging.basicConfig(filename='smiles_gap_log.txt', level=logging.DEBUG)
 
@@ -84,7 +85,7 @@ def get_bandgap_openbabel(smiles):
 
     return -1
 
-def get_bandgap_unique(smiles):
+def get_bandgap_unique(smiles, xtb_run):
     # convert SMILES to 3D coordinates
     obConversion = pybel.ob.OBConversion()
     obConversion.SetInAndOutFormats("smi", "xyz")
@@ -103,33 +104,42 @@ def get_bandgap_unique(smiles):
     filename = hex_dig
     xyz_output = obConversion.WriteString(mol.OBMol)
 
-    with open(filename + '.xyz', 'w') as f:
+    #xtb_dir = 'xtb_data_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime())
+    xtb_dir = 'xtb_data_' + xtb_run
+    if not os.path.exists(xtb_dir):
+        os.makedirs(xtb_dir)
+    file_path = os.path.join(xtb_dir, filename)
+    with open(file_path + '.xyz', 'w') as f:
         f.write(xyz_output)
 
     # Run xtb command
-    cmd = 'xtb --verbose -P 4 --chrg 0 --uhf 0 --ohess --opt extreme --namespace {0} -- {0}.xyz > {0}.out'.format(filename)
+    #cmd = 'xtb --verbose -P 4 --chrg 0 --uhf 0 --ohess --opt extreme --namespace {0} -- {0}.xyz > {0}.out'.format(filename)
+    cmd = 'xtb --verbose -P 4 --chrg 0 --uhf 0 --opt tight --namespace {0} -- {0}.xyz > {0}.out'.format(file_path)
     subprocess.run(cmd, shell=True)
 
     # Use grep command to find the line with HOMO-LUMO GAP and extract the value
-    grep_cmd = "grep 'HOMO-LUMO GAP' {0}.out | awk '{{print $4}}'".format(filename)
+    grep_cmd = "grep 'HOMO-LUMO GAP' {0}.out | awk '{{print $4}}'".format(file_path)
     gap = subprocess.check_output(grep_cmd, shell=True)
 
     # if gap == 2.0 within a threshold, perform DFT
     # Remove unnecessary files
-    files_to_remove = [filename + ext for ext in ['.wbo', '.vibspectrum', '.xtbopt.log', '.charges', '.hessian', '.g98.out', '.xtbrestart', '.xtbtopo.mol']]
+    files_to_remove = [file_path + ext for ext in ['.wbo', '.vibspectrum', '.xtbopt.log', '.charges', '.hessian', '.g98.out', '.xtbrestart', '.xtbtopo.mol']]
     for file in files_to_remove:
         try:
             os.remove(file)
         except FileNotFoundError:
             pass
 
-    if gap:
-        logger = setup_custom_logger('bandgap_logger', 'bandgap.log')
-        logger.info(f"SMILES: {smiles}, GAP: {float(gap)}")
+    #if gap:
+    #    logger = setup_custom_logger('bandgap_logger', 'bandgap.log')
+    #    logger.info(f"SMILES: {smiles}, GAP: {float(gap)}")
         
-    if not gap:
-        return -1.0
+    if isinstance(float(gap), float):
+        return float(gap)
+    else:
+        print('Error in SMILE: '+smiles+' '+filename, flush=True)
+        return -1
 
-    return float(gap)
-
+if __name__ == "__main__":
+    get_bandgap_unique('C')
 

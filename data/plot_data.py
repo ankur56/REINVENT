@@ -4,8 +4,9 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from scipy.integrate import trapz
 
-def plot_data(load_dir, np_file, save_dir=None):
+def plot_data(load_dir, np_file, run_dir, save_dir=None):
     """
     Plot data from a NumPy file and save the plot as a PNG.
 
@@ -16,12 +17,19 @@ def plot_data(load_dir, np_file, save_dir=None):
     """
     scores = np.load(os.path.join(load_dir, np_file))
     filename = os.path.splitext(os.path.basename(np_file))[0]
-
+    filename = run_dir + '_' + filename
     plt.figure()
-    plt.plot(scores, label=filename)
-    plt.legend()
-    plt.title(filename)
+    plt.plot(scores)
+    #plt.legend()
+    plt.title(filename, fontsize=6)
+    if 'sigmas' not in np_file:
+        plt.ylim(0, 1)
     plt.tight_layout()
+
+    if 'st_scores' in np_file:
+        x = np.arange(1, len(scores)+1)
+        area = trapz(scores, x)
+        plt.annotate(r'AUC = {:.2f}'.format(area), xy=(0.05, 0.95), xycoords='axes fraction')
 
     if save_dir:
         if not os.path.exists(save_dir):
@@ -34,9 +42,11 @@ def main(args):
     load_dir = os.path.join('results', args.run_dir)
     save_dir = os.path.join('plots', args.run_dir)
 
-    plot_data(load_dir, 'training_log_scores.npy', save_dir)
-    plot_data(load_dir, 'training_log_valid.npy', save_dir)
-    plot_data(load_dir, 'training_log_novel.npy', save_dir)
+    plot_data(load_dir, 'training_log_scores.npy', args.run_dir, save_dir)
+    #plot_data(load_dir, 'training_log_sigmas.npy', args.run_dir, save_dir)
+    plot_data(load_dir, 'training_log_st_scores.npy', args.run_dir, save_dir)
+    plot_data(load_dir, 'training_log_valid.npy', args.run_dir, save_dir)
+    plot_data(load_dir, 'training_log_novel.npy', args.run_dir, save_dir)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot data from NumPy files.")

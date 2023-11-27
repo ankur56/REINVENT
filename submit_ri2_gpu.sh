@@ -3,7 +3,7 @@
 #SBATCH -A m4079
 #SBATCH -C gpu
 #SBATCH -q shared
-#SBATCH -t 2:30:00
+#SBATCH -t 4:00:00
 #SBATCH -n 1
 #SBATCH -c 32
 #SBATCH --gpus-per-task=1

@@ -1,0 +1,5 @@
+SMILES Score PriorLogP
+b1cc2[nH]c3c(c2c2bc4c(bc12)ncc1c2ccccc2c2ccccc2c41)Bc1cnccc1-3 0.00 -31.04
+B1c2ccoc2-c2ccc3ccoc3c21 0.00 -16.22
+B1C=CBC2=C1Bc1c(c3oc4c5cc[nH]c5oc4c3c3c1sc1ccc4nc5occc5nc4c13)B2 0.00 -34.44
+b1c2nccnc2bc2c1c1cc3cc4c(ccc5ccccc54)cc3cc1c1ccc3ccc4[nH]ccc4c3c21 0.00 -22.02
