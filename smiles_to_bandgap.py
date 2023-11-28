@@ -134,9 +134,9 @@ def get_bandgap_unique(smiles, xtb_run):
     #    logger = setup_custom_logger('bandgap_logger', 'bandgap.log')
     #    logger.info(f"SMILES: {smiles}, GAP: {float(gap)}")
         
-    if isinstance(float(gap), float):
+    try:
         return float(gap)
-    else:
+    except ValueError:
         print('Error in SMILE: '+smiles+' '+filename, flush=True)
         return -1
 

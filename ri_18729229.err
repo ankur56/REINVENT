@@ -1,0 +1,101 @@
+
+The following have been reloaded with a version change:
+  1) gcc/10.3.0 => gcc/11.2.0
+
+normal termination of xtb
+normal termination of xtb
+abnormal termination of xtb
+abnormal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+normal termination of xtb
+concurrent.futures.process._RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/global/homes/a/ankur/.conda/envs/reinvent2/lib/python3.9/concurrent/futures/process.py", line 246, in _process_worker
+    r = call_item.fn(*call_item.args, **call_item.kwargs)
+  File "/global/homes/a/ankur/.conda/envs/reinvent2/lib/python3.9/concurrent/futures/process.py", line 205, in _process_chunk
+    return [fn(*args) for args in chunk]
+  File "/global/homes/a/ankur/.conda/envs/reinvent2/lib/python3.9/concurrent/futures/process.py", line 205, in <listcomp>
+    return [fn(*args) for args in chunk]
+  File "/pscratch/sd/a/ankur/reinvent/alt/REINVENT/scoring_functions.py", line 63, in __call__
+    bandgap = get_bandgap_unique(csmile, xtb_run)
+  File "/pscratch/sd/a/ankur/reinvent/alt/REINVENT/smiles_to_bandgap.py", line 137, in get_bandgap_unique
+    if isinstance(float(gap), float):
+ValueError: could not convert string to float: ''
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/pscratch/sd/a/ankur/reinvent/alt/REINVENT/main.py", line 72, in <module>
+    train_agent(**arg_dict)
+  File "/pscratch/sd/a/ankur/reinvent/alt/REINVENT/train_agent.py", line 106, in train_agent
+    score_bandgap = scoring_function_call(smiles)
+  File "/pscratch/sd/a/ankur/reinvent/alt/REINVENT/scoring_functions.py", line 244, in __call__
+    scores = list(executor.map(scoring_func_with_limits, smiles))
+  File "/global/homes/a/ankur/.conda/envs/reinvent2/lib/python3.9/concurrent/futures/process.py", line 562, in _chain_from_iterable_of_lists
+    for element in iterable:
+  File "/global/homes/a/ankur/.conda/envs/reinvent2/lib/python3.9/concurrent/futures/_base.py", line 609, in result_iterator
+    yield fs.pop().result()
+  File "/global/homes/a/ankur/.conda/envs/reinvent2/lib/python3.9/concurrent/futures/_base.py", line 439, in result
+    return self.__get_result()
+  File "/global/homes/a/ankur/.conda/envs/reinvent2/lib/python3.9/concurrent/futures/_base.py", line 391, in __get_result
+    raise self._exception
+ValueError: could not convert string to float: ''

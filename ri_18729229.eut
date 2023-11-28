@@ -1,0 +1,9 @@
+begun main sequence
+about to train agent
+started training
+sigma used: 500
+sigma mode: static
+Model initialized, starting training...
+Batch Size:  64
+Upper Limit:  3.0
+Lower Limit:  2.0

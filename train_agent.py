@@ -161,7 +161,8 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
 
             r = np.random.uniform(0, 1)
 
-            epsilon = max(0.9 - 0.1 * step, 0.1)
+            #epsilon = max(0.9 - 0.1 * step, 0.1)
+            epsilon = max(0.5 - (0.1 * step), 0.1)
 
             if r < epsilon:
                	prior_orig = prior_likelihood.clone()
