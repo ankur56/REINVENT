@@ -10,7 +10,7 @@ from shutil import copyfile
 from model import RNN
 from data_structs import Vocabulary, Experience
 from scoring_functions import get_scoring_function
-from utils import Variable, seq_to_smiles, fraction_valid_smiles, unique, sa_score, percentage_easy_sa, percentage_unique, check_and_save_smiles
+from utils import Variable, seq_to_smiles, fraction_valid_smiles, unique, sa_score, percentage_easy_sa, percentage_unique, check_and_save_smiles, check_dup
 from vizard_logger import VizardLog
 from scipy.stats import levy
 
@@ -20,10 +20,10 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
                 scoring_function_kwargs=None,
                 save_dir=None, learning_rate=0.0005,
                 batch_size=16, lb=2, ub=3, n_steps=3000,
-                num_processes=0, sigma=20, sigma_mode='static',
+                num_processes=0, sigma_val=20, sigma_mode='static',
                 lambda_1=2, lambda_2=2, experience_replay=0):
     print('started training')
-    print('sigma used: ' + str(sigma))
+    print('sigma used: ' + str(sigma_val))
     print('sigma mode: ' + sigma_mode)
     voc = Vocabulary(init_from_file="data/Voc")
 
@@ -49,15 +49,17 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         param.requires_grad = False
 
     optimizer = torch.optim.Adam(Agent.rnn.parameters(), lr=0.0005)
+    with open("data/mols_filtered.smi", 'r') as f:
+        smiles_set = set(line.strip() for line in f)
 
-    if sigma_mode == 'static':
-        xtb_run = 'run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_s_' + str(sigma) + '_bs_' + str(batch_size)+ '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps) + '_l2_' + str(lambda_2)
+    if sigma_mode == 'static' or sigma_mode == 'static_greedy':
+        xtb_run = 'run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_s_' + str(sigma_val) + '_bs_' + str(batch_size)+ '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps)
     else:
-        xtb_run = 'run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_l1_' + str(lambda_1) + '_bs_' + str(batch_size) + '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps) + '_l2_' + str(lambda_2)
+        xtb_run = 'run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_bs_' + str(batch_size) + '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps)
 
 
     # Scoring_function
-    scoring_function_call = get_scoring_function(scoring_function=scoring_function, num_processes=num_processes, batch_size=batch_size, upper_limit=ub, lower_limit=lb, xtb_run=xtb_run,
+    scoring_function_call = get_scoring_function(scoring_function=scoring_function, num_processes=num_processes, batch_size=batch_size, upper_limit=ub, lower_limit=lb, xtb_run=xtb_run, train_set=smiles_set,
                                             **scoring_function_kwargs)
 
     # For policy based RL, we normally train on-policy and correct for the fact that more likely actions
@@ -72,19 +74,18 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
     logger.log(Agent.rnn.gru_2.bias_ih.cpu().data.numpy(), "init_weight_GRU_layer_2_b_ih")
     logger.log(Agent.rnn.gru_2.bias_hh.cpu().data.numpy(), "init_weight_GRU_layer_2_b_hh")
 
-
-    with open("data/mols_filtered.smi", 'r') as f:
-        smiles_set = set(line.strip() for line in f)
-
     # Information for the logger
     step_score = [[], []]
     sa = []
+    dup = []
     novel = []
     valid = []
     scores = []
     sigmas = []
     standard_score = []
+    standard_score2 = []
     save_every_n = 25
+    gen_set = set()
 
     print("Model initialized, starting training...")
 
@@ -102,13 +103,19 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
         # Get prior likelihood and score
         prior_likelihood, _ = Prior.likelihood(Variable(seqs))
         smiles = seq_to_smiles(seqs, voc)
+        
+        dup.append(check_dup(smiles, gen_set))
 
-        score_bandgap = scoring_function_call(smiles)
+        score_bandgap = scoring_function_call(smiles, gen_set)
         score = score_bandgap[:, 0]
         bandgap = score_bandgap[:, 1]
         
+        gen_set.update(smiles)
+ 
         batch_score = sum(lb < b < ub for b in bandgap)
-        
+
+        st_score2 = np.sum(score[score >= 0])
+
         # Sigma updating scheme
         if sigma_mode == 'linear_decay':
             rate = 0.1
@@ -149,6 +156,65 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
                     sigma[i] = lambda_1 * np.abs(prior)
             sigma = torch.from_numpy(sigma)
 
+        if sigma_mode == 'prior_std':
+            std = np.std(prior_likelihood.numpy())
+            sigma = (1.0/std)*np.mean(prior_likelihood.numpy()**2)
+
+        if sigma_mode == 'prior_std2':
+            std = np.std(prior_likelihood.numpy())
+            sigma = std*np.mean(np.abs(prior_likelihood.numpy()))
+        
+        if sigma_mode == 'prior_std_cap':
+            std = np.std(prior_likelihood.numpy())
+            std_mean = std*np.mean(np.abs(prior_likelihood.numpy()))
+            sigma = min(max(std_mean, 60), 300)
+        
+        if sigma_mode == 'rand_uni':
+            sigma = np.random.uniform(60, 300)
+        
+        if sigma_mode == 'rand_nor':
+            low = 60
+            high = 300
+            avg = (low + high)*0.5
+            std_scale = (high - avg)/3
+            rn = np.random.normal(avg, std_scale)
+            sigma = min(max(rn, low), high)
+         
+        if sigma_mode == 'rand_logi':
+            low = 60
+            high = 300
+            avg = (low + high)*0.5
+            std_scale = (high - avg)/3
+            rn = np.random.logistic(avg, std_scale)
+            sigma = min(max(rn, low), high)
+        
+        if sigma_mode == 'prior_std2_greedy':
+            sigma = np.zeros_like(bandgap)
+            std = np.std(prior_likelihood.numpy())
+            sigma_scaler = std*np.mean(np.abs(prior_likelihood.numpy()))
+            for i, b in enumerate(bandgap):
+                if lb < b < ub:
+                    sigma[i] = sigma_scaler
+            sigma = torch.from_numpy(sigma)
+         
+        if sigma_mode == 'static_greedy':
+            sigma = np.zeros_like(bandgap)
+            for i, b in enumerate(bandgap):
+                if lb < b < ub:
+                    sigma[i] = sigma_val
+            sigma = torch.from_numpy(sigma)
+        
+        if sigma_mode == 'static':
+            sigma = sigma_val
+        
+        if sigma_mode == 'prior_square':
+            #lambda_1 = 2
+            sigma = np.zeros_like(bandgap)
+
+            for i, (b, prior) in enumerate(zip(bandgap, prior_likelihood)):
+                if lb < b < ub:
+                    sigma[i] = np.abs(prior)**2
+            sigma = torch.from_numpy(sigma)
 
         if sigma_mode == 'prior_greedy':
             #lambda_1 = 2
@@ -161,8 +227,8 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
 
             r = np.random.uniform(0, 1)
 
-            #epsilon = max(0.9 - 0.1 * step, 0.1)
-            epsilon = max(0.5 - (0.1 * step), 0.1)
+            epsilon = max(0.9 - 0.1 * step, 0.1)
+            #epsilon = max(0.5 - (0.1 * step), 0.1)
 
             if r < epsilon:
                	prior_orig = prior_likelihood.clone()
@@ -172,24 +238,13 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
                     if lb < b < ub:
                         sigma[i] = lambda_1 * np.abs(prior)
                 sigma = torch.from_numpy(sigma)
-        
 
-        def h(bgap):
-            if bgap < lb:
-                return (lb - bgap) ** 2
-            elif bgap > ub:
-                return (bgap - ub) ** 2
-            else:
-                return 0
-
-        p = torch.from_numpy(np.array([h(bg) for bg in bandgap]))
         sigmas.append(sigma)
-
-        print(len([val for val in bandgap if val < ub and val > lb])/len(bandgap))
 
         # Calculate augmented likelihood
         #augmented_likelihood = prior_likelihood + sigma * Variable(score) + batch_reward
-        augmented_likelihood = prior_likelihood + (sigma * Variable(score)) - (lambda_2*p)
+        #augmented_likelihood = prior_likelihood + (sigma * Variable(score)) - (lambda_2*p)
+        augmented_likelihood = prior_likelihood + (sigma * Variable(score))
         #augmented_likelihood = (1 - sigma) * prior_likelihood + sigma * Variable(score)
         loss = torch.pow((augmented_likelihood - agent_likelihood), 2)
 
@@ -255,67 +310,78 @@ def train_agent(restore_prior_from='data/Prior.ckpt',
 
         # Log SMILES diagnostics
         #sa.append(percentage_easy_sa(smiles))
-        novel.append(check_and_save_smiles(smiles, smiles_set, present_filepath="present_smiles.smi", absent_filepath="absent_smiles.smi"))
+        #novel.append(check_and_save_smiles(smiles, smiles_set, present_filepath="present_smiles.smi", absent_filepath="absent_smiles.smi"))
+        novel.append(check_dup(smiles, smiles_set))
+        #dup.append(check_dup(smiles, new_smiles))
+        #new_smiles.update(smiles)
         #novel.append(percentage_unique(smiles))
         valid.append(fraction_valid_smiles(smiles))
         scores.append(np.mean(score))
         standard_score.append(batch_score/batch_size)
+        standard_score2.append(st_score2/batch_size)
         if not save_dir:
-            if sigma_mode == 'static': 
-                save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_s_' + str(sigma) + '_bs_' + str(batch_size)+ '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps) + '_l2_' + str(lambda_2)
+            if sigma_mode == 'static' or sigma_mode == 'static_greedy': 
+                save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_s_' + str(sigma_val) + '_bs_' + str(batch_size)+ '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps)
             else:
-                save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_l1_' + str(lambda_1) + '_bs_' + str(batch_size) + '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps) + '_l2_' + str(lambda_2)
+                save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_bs_' + str(batch_size) + '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps)
             #else:
             #    save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode
 
         if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
+            os.makedirs(save_dir, exist_ok=True)
 
         if step % save_every_n == save_every_n - 1:
             np.save(os.path.join(save_dir,'training_log_novel.npy'), np.array(novel))
+            np.save(os.path.join(save_dir,'training_log_dup.npy'), np.array(dup))
             np.save(os.path.join(save_dir,'training_log_valid.npy'), np.array(valid))
             np.save(os.path.join(save_dir,'training_log_scores.npy'), np.array(scores))
             np.save(os.path.join(save_dir,'training_log_st_scores.npy'), np.array(standard_score))
-            #np.save(os.path.join(save_dir,'training_log_sigmas.npy'), np.array(sigmas))
+            np.save(os.path.join(save_dir,'training_log_st2_scores.npy'), np.array(standard_score2))
+            np.save(os.path.join(save_dir,'training_log_sigmas.npy'), np.array(sigmas))
 
     # If the entire training finishes, we create a new folder where we save this python file
     # as well as some sampled sequences and the contents of the experinence (which are the highest
     # scored sequences seen during training)
     if not save_dir:
-        if sigma_mode == 'static': 
-            save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_s_' + str(sigma) + '_bs_' + str(batch_size) + '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps) + '_l2_' + str(lambda_2)
+        if sigma_mode == 'static' or sigma_mode == 'static_greedy': 
+            save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_s_' + str(sigma_val) + '_bs_' + str(batch_size) + '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps)
         else:
-            save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_l1_' + str(lambda_) + '_bs_' + str(batch_size) + '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps) + '_l2_' + str(lambda_2)
+            save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode + '_bs_' + str(batch_size) + '_lb_' + str(lb) + '_ub_' + str(ub) + '_ns_' + str(n_steps)
         #else:
         #    save_dir = 'data/results/run_' + time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime()) + '_sf_' + scoring_function + '_sm_' + sigma_mode
     
     if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
+        os.makedirs(save_dir, exist_ok=True)
     
     copyfile('train_agent.py', os.path.join(save_dir, "train_agent.py"))
 
     experience.print_memory(os.path.join(save_dir, "memory"))
     torch.save(Agent.rnn.state_dict(), os.path.join(save_dir, 'Agent.ckpt'))
 
-    seqs, agent_likelihood, entropy = Agent.sample(16)
-    prior_likelihood, _ = Prior.likelihood(Variable(seqs))
-    prior_likelihood = prior_likelihood.data.cpu().numpy()
-    smiles = seq_to_smiles(seqs, voc)
-    score_bg2 = scoring_function_call(smiles)
-    score2 = score_bg2[:, 0]
+    #seqs, agent_likelihood, entropy = Agent.sample(16)
+    #prior_likelihood, _ = Prior.likelihood(Variable(seqs))
+    #prior_likelihood = prior_likelihood.data.cpu().numpy()
+    #smiles = seq_to_smiles(seqs, voc)
+    #score_bg2 = scoring_function_call(smiles)
+    #score2 = score_bg2[:, 0]
     
     # Log diagnostics 
     #np.save(os.path.join(save_dir,'training_log_sa.npy'), np.array(sa))
     np.save(os.path.join(save_dir,'training_log_novel.npy'), np.array(novel))
+    np.save(os.path.join(save_dir,'training_log_dup.npy'), np.array(dup))
     np.save(os.path.join(save_dir,'training_log_valid.npy'), np.array(valid))
     np.save(os.path.join(save_dir,'training_log_scores.npy'), np.array(scores))
     np.save(os.path.join(save_dir,'training_log_st_scores.npy'), np.array(standard_score))
-    #np.save(os.path.join(save_dir,'training_log_sigmas.npy'), np.array(sigmas))
+    np.save(os.path.join(save_dir,'training_log_st2_scores.npy'), np.array(standard_score2))
+    np.save(os.path.join(save_dir,'training_log_sigmas.npy'), np.array(sigmas))
+    with open(xtb_run+'.txt', 'w') as file:
+        for smile in gen_set:
+            file.write(smile + '\n')
 
-    with open(os.path.join(save_dir, "sampled"), 'w') as f:
-        f.write("SMILES Score PriorLogP\n")
-        for smiles, score2, prior_likelihood in zip(smiles, score2, prior_likelihood):
-            f.write("{} {:5.2f} {:6.2f}\n".format(smiles, score2, prior_likelihood))
+    #with open(os.path.join(save_dir, "sampled"), 'w') as f:
+    #    f.write("SMILES Score PriorLogP\n")
+    #    for smiles, score2, prior_likelihood in zip(smiles, score2, prior_likelihood):
+    #        f.write("{} {:5.2f} {:6.2f}\n".format(smiles, score2, prior_likelihood))
 
 if __name__ == "__main__":
     train_agent()
